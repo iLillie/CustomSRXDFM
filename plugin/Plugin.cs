@@ -11,6 +11,7 @@ namespace CustomSRXDFM
         {
             var harmony = new Harmony(PluginInfo.PLUGIN_GUID);
              harmony.PatchAll(typeof(RadioSocketPatches));
+             harmony.PatchAll(typeof(TrackListSystemPatches));
             // Plugin startup logic
             Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
         }

@@ -1,0 +1,30 @@
+"stations": [
+  {
+    id: "CustomFM",
+    name: "CustomFM",
+    players: 0,
+    cover: "",
+    nextSongs: [
+      {
+        name: "",
+        difficulty: "Hard",
+        startTime: Date.now(),
+        topScore: 0,
+      },
+      {
+        name: "",
+        difficulty: "Hard",
+        startTime: Date.now(),
+        topScore: 0,
+      },
+      {
+        name: "",
+        difficulty: "Hard",
+        startTime: Date.now(),
+        topScore: 0,
+      },
+    ],
+    descriptionFallback: "",
+    descriptionKey: "",
+  },
+],
