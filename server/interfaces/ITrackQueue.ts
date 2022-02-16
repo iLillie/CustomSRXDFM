@@ -1,9 +1,10 @@
+import { IPlaylist } from './index';
 enum QueueType {
   Order,
   Shuffle,
 }
 
-interface ITrackQueue {
+export interface ITrackQueue {
   type: QueueType;
   playlist: IPlaylist;
 }

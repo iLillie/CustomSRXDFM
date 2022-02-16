@@ -1,3 +1,5 @@
+import { IPlayer } from "../interfaces";
+
 class ConnectedPlayer implements IPlayer {
   id: string;
   name: string;

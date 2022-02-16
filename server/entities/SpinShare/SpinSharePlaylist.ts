@@ -1,3 +1,5 @@
+import { IPlaylist, ITrack } from "../../interfaces";
+
 class SpinSharePlaylist implements IPlaylist {
   version: number;
   id: number;

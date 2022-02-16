@@ -1,4 +1,6 @@
-interface IPlaylist {
+import { ITrack } from './index';
+
+export interface IPlaylist {
   version: number;
   id: number;
   title: string;
@@ -6,11 +8,4 @@ interface IPlaylist {
   songs: ITrack[];
 }
 
-class SpinSharePlaylist implements IPlaylist {
-  version: number;
-  id: number;
-  title: string;
-  description: string;
-  songs: ITrack[];
-  isOfficial: boolean;
-}
+

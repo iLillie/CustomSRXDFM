@@ -1,3 +1,5 @@
+import { IAsset, IDifficulty, ITrack } from "../../interfaces";
+
 class SpinShareTrack implements ITrack {
   title: string;
   subTitle: string;
