@@ -11,6 +11,8 @@ import { PlayerHandler } from "./PlayerHandler";
 import { SongHandler } from "./SongHandler";
 import { Track } from "./Track";
 
+const port = process.env.PORT || 3000;
+
 const io = Server(httpServer, {
   origins: ["*:*"],
   pingTimeout: 60000,
@@ -98,7 +100,6 @@ function handleEmote(socket: Server.Socket, data: any, station: Station) {
 
 function handleSync(socket: Server.Socket, data: any, station: Station) {
   socket.emit("ntp:server_sync", { t0: data.t0, t1: Date.now() });
-  console.log(Date.now().toString())
   socket.emit("leaderboard", station.getLeaderboard(socket.conn.id));
 }
 
@@ -174,7 +175,6 @@ app.all("/**", function (req, res) {
   console.log(req.url);
 });
 
-const port = 3000;
 httpServer.listen(port, () => {
   console.log(`SRXDFM server is running on ${port}.`);
 });
