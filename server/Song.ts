@@ -21,6 +21,5 @@ export class Song {
     this.startTime = startTime;
     this.leaderboardKey = leaderboardKey;
     this.endTime = endTime;
-    console.log(startTime);
   }
 }

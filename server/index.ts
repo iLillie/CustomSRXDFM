@@ -25,7 +25,6 @@ class Station {
   cover: string;
   playerHandler: PlayerHandler;
   songHandler: SongHandler;
-
   descriptionFallback: string;
   descriptionKey: string;
 
@@ -35,6 +34,8 @@ class Station {
     this.cover = cover;
     this.songHandler = new SongHandler(tracks);
     this.playerHandler = new PlayerHandler();
+    this.descriptionFallback = "";
+    this.descriptionKey = "";
   }
 
   getStation() {
@@ -44,8 +45,8 @@ class Station {
       players: this.playerHandler.players.size,
       nextSongs: this.songHandler.getStationSongs(),
       cover: this.cover,
-      descriptionFallback: "",
-      descriptionKey: ""
+      descriptionFallback: this.descriptionFallback,
+      descriptionKey: this.descriptionKey
     }
   }
 
@@ -59,7 +60,7 @@ class Station {
     }
   }
   setupStation() {
-    this.songHandler.updateQueue();
+    this.songHandler.setupQueue();
   }
 }
 
@@ -69,70 +70,100 @@ let leaderboard: Station = new Station(
   "CustomFM",
   "CustomFM",
   "Cover-SpinFM1-Easy-Cruise",
-  customTracks.filter(track => track.difficulty == "Normal")
+  customTracks.filter(track => track.difficulty == "XD")
 );
 
 leaderboard.setupStation();
 
+let leaderboard2: Station = new Station(
+    "CustomFM2",
+    "CustomFM Expert",
+    "Cover-SpinFM1-Easy-Cruise",
+    customTracks.filter(track => track.difficulty == "Expert")
+);
+
+leaderboard2.setupStation();
+
 // Handlers
 
-function handleEmote(socket: Server.Socket, data: any) {
+function handleEmote(socket: Server.Socket, data: any, station: Station) {
   let emote: string = data.val;
   if (emote === "Skull") {
-    leaderboard.playerHandler.playerDied(socket.conn.id);
+    station.playerHandler.playerDied(socket.conn.id);
     return;
   }
-  let playerId = leaderboard.playerHandler.getPlayer(socket.conn.id).id;
+  let playerId = station.playerHandler.getPlayer(socket.conn.id).id;
   socket.emit("emote", { emote: emote, playerId: playerId });
 }
 
-function handleSync(socket: Server.Socket, data: any) {
+function handleSync(socket: Server.Socket, data: any, station: Station) {
   socket.emit("ntp:server_sync", { t0: data.t0, t1: Date.now() });
-  socket.emit("leaderboard", leaderboard.getLeaderboard(socket.conn.id));
+  socket.emit("leaderboard", station.getLeaderboard(socket.conn.id));
 }
 
-function handlePlayer(socket: Server.Socket, data: any) {
-  leaderboard.playerHandler.addPlayer(socket.conn.id, data.name, data.id);
-  console.log(leaderboard.getLeaderboard(socket.conn.id));
-  socket.emit("leaderboard", leaderboard.getLeaderboard(socket.conn.id));
+function handlePlayer(socket: Server.Socket, data: any, station: Station) {
+  station.playerHandler.addPlayer(socket.conn.id, data.name, data.id);
+  socket.emit("leaderboard", station.getLeaderboard(socket.conn.id));
 }
 
-function handleScore(socket: Server.Socket, data: any) {
-  leaderboard.playerHandler.updateScore(socket.conn.id, data.val);
-  socket.emit("leaderboard", leaderboard.getLeaderboard(socket.conn.id));
+function handleScore(socket: Server.Socket, data: any, station: Station) {
+  station.playerHandler.updateScore(socket.conn.id, data.val);
+  socket.emit("leaderboard", station.getLeaderboard(socket.conn.id));
 }
 
-function handleDisconnect(socket: Server.Socket) {
-  leaderboard.playerHandler.removePlayer(socket.conn.id);
+function handleDisconnect(socket: Server.Socket, station: Station) {
+  station.playerHandler.removePlayer(socket.conn.id);
 }
 
 io.of("/CustomFM").on("connection", (socket) => {
   socket.on("ntp:client_sync", (d) => {
-    handleSync(socket, d);
+    handleSync(socket, d, leaderboard);
   });
 
   socket.on("username", (d) => {
-    handlePlayer(socket, d);
+    handlePlayer(socket, d, leaderboard);
   });
 
   socket.on("score", (d) => {
-    handleScore(socket, d);
+    handleScore(socket, d, leaderboard);
   });
 
   socket.on("disconnect", () => {
-    handleDisconnect(socket);
+    handleDisconnect(socket, leaderboard);
   });
 
   socket.on("emotein", (d) => {
-    handleEmote(socket, d);
+    handleEmote(socket, d, leaderboard);
   });
 });
 
+io.of("/CustomFM2").on("connection", (socket) => {
+  socket.on("ntp:client_sync", (d) => {
+    handleSync(socket, d, leaderboard2);
+  });
+
+  socket.on("username", (d) => {
+    handlePlayer(socket, d, leaderboard2);
+  });
+
+  socket.on("score", (d) => {
+    handleScore(socket, d, leaderboard2);
+  });
+
+  socket.on("disconnect", () => {
+    handleDisconnect(socket, leaderboard);
+  });
+
+  socket.on("emotein", (d) => {
+    handleEmote(socket, d, leaderboard);
+  });
+});
 
 app.get("/api/stations", function (req, res) {
   res.json({
     stations: [
-      leaderboard.getStation()
+      leaderboard.getStation(),
+        leaderboard2.getStation()
     ],
   });
 });
