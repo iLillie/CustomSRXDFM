@@ -93,11 +93,12 @@ function handleEmote(socket: Server.Socket, data: any, station: Station) {
     return;
   }
   let playerId = station.playerHandler.getPlayer(socket.conn.id).id;
-  socket.emit("emote", { emote: emote, playerId: playerId });
+  socket.broadcast.emit("emote", { emote: emote, playerId: playerId });
 }
 
 function handleSync(socket: Server.Socket, data: any, station: Station) {
   socket.emit("ntp:server_sync", { t0: data.t0, t1: Date.now() });
+  console.log(Date.now().toString())
   socket.emit("leaderboard", station.getLeaderboard(socket.conn.id));
 }
 
@@ -138,6 +139,7 @@ io.of("/CustomFM").on("connection", (socket) => {
 });
 
 io.of("/CustomFM2").on("connection", (socket) => {
+  console.log(`Id: ${socket.id} conn.id: ${socket.conn.id}`)
   socket.on("ntp:client_sync", (d) => {
     handleSync(socket, d, leaderboard2);
   });
@@ -151,11 +153,11 @@ io.of("/CustomFM2").on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    handleDisconnect(socket, leaderboard);
+    handleDisconnect(socket, leaderboard2);
   });
 
   socket.on("emotein", (d) => {
-    handleEmote(socket, d, leaderboard);
+    handleEmote(socket, d, leaderboard2);
   });
 });
 
