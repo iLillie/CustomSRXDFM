@@ -53,12 +53,12 @@ class Station {
   }
 
   getLeaderboard(socketId: string) {
+    this.playerHandler.calculateRanks();
     return {
       song: this.songHandler.getLeaderboardSongs(),
       ...this.playerHandler.getTotalStats(socketId),
       playerIdsToRegister: this.playerHandler.idsToRegister,
       playerIdsToUnregister: [],
-      maxRank: 1
     }
   }
   setupStation() {
@@ -95,7 +95,7 @@ function handleEmote(socket: Server.Socket, data: any, station: Station) {
     return;
   }
   let playerId = station.playerHandler.getPlayer(socket.conn.id).id;
-  socket.broadcast.emit("emote", { emote: emote, playerId: playerId });
+  socket.nsp.emit("emote", { emote: emote, playerId: playerId });
 }
 
 function handleSync(socket: Server.Socket, data: any, station: Station) {

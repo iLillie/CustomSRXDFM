@@ -24,6 +24,16 @@ export class PlayerHandler {
     this.getPlayer(socketId).score = newScore;
   }
 
+  calculateRanks() {
+    let ranks = [...this.players.values()].sort(function (a, b) {
+      return b.score - a.score;
+    });
+
+    for (let i = 0; i < ranks.length; i++) {
+      ranks[i].ranks = i+1;
+    }
+  }
+
   getTotalStats(socketId: string) {
     let index = 0;
     let aliveCount = 0;
@@ -59,6 +69,7 @@ export class PlayerHandler {
       totalPlayers: totalPlayers,
       indexOfPlayer: indexOfPlayer,
       aliveCount: aliveCount,
+      maxRank: totalPlayers
     };
   }
 
