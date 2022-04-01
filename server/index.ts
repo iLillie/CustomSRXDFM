@@ -104,6 +104,7 @@ function handleSync(socket: Server.Socket, data: any, station: Station) {
 
 function handlePlayer(socket: Server.Socket, data: any, station: Station) {
   station.playerHandler.addPlayer(socket.conn.id, data.name, data.id);
+  console.log(`Added player: ${socket.conn.id} : ${data.name}`);
   socket.emit("leaderboard", station.getLeaderboard(socket.conn.id));
 }
 
@@ -139,6 +140,7 @@ io.of("/CustomFM").on("connection", (socket) => {
 
   leaderboard.songHandler.eventEmitter.on("nextSong", () => {
     leaderboard.playerHandler.resetScore();
+    if(leaderboard2.playerHandler.getPlayer(socket.conn.id) == null) return;
     socket.emit("leaderboard", leaderboard.getLeaderboard(socket.conn.id));
   })
 });
@@ -166,6 +168,7 @@ io.of("/CustomFM2").on("connection", (socket) => {
 
   leaderboard2.songHandler.eventEmitter.on("nextSong", () => {
     leaderboard2.playerHandler.resetScore();
+    if(leaderboard2.playerHandler.getPlayer(socket.conn.id) == null) return;
     socket.emit("leaderboard", leaderboard2.getLeaderboard(socket.conn.id));
   })
 
