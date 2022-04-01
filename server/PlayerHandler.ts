@@ -78,6 +78,13 @@ export class PlayerHandler {
     return [...this.players.values()].map(player => player.ranks);
   }
 
+  resetScore() {
+    [...this.players.values()].forEach(player => {
+      player.score = 0;
+      player.ranks = 0;
+    })
+}
+
 
 
 

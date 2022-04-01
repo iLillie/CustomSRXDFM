@@ -1,10 +1,12 @@
 import {setDriftlessTimeout} from "driftless";
 import {Track} from "./Track";
 import {Song} from "./Song";
+import EventEmitter from "events";
 
 export class SongHandler {
     queuedSongs: Song[];
     tracks: Track[];
+    eventEmitter: EventEmitter;
 
     randomTrack = () => this.tracks[Math.floor(Math.random() * this.tracks.length)];
 
@@ -41,8 +43,9 @@ export class SongHandler {
         this.queuedSongs.shift();
         setDriftlessTimeout(() => {
             this.nextSong();
-        }, this.queuedSongs[0].endTime + 5000)
+        }, this.queuedSongs[0].endTime + 15000)
         this.addSongToQueue();
+        this.eventEmitter.emit("nextSong");
     }
 
 
@@ -86,5 +89,6 @@ export class SongHandler {
     constructor(tracks: Track[]) {
         this.queuedSongs = [];
         this.tracks = tracks;
+        this.eventEmitter = new EventEmitter();
     }
 }
