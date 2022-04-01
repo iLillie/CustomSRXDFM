@@ -27,7 +27,7 @@ export class SongHandler {
             randomTrack.difficulty,
             randomTrack.name,
             randomTrack.leaderboardKey,
-            startTime + 5000,
+            startTime + 15000,
             this.trackTimeToMS(randomTrack.endTime)
         );
     }
@@ -52,7 +52,7 @@ export class SongHandler {
         for (let i = 0; i < 3; i++) {
             let track = this.randomTrack();
             this.queuedSongs.push(new Song(track.difficulty, track.name, track.leaderboardKey, Date.now() + globalStartTime, this.trackTimeToMS(track.endTime)))
-            globalStartTime += this.trackTimeToMS(track.endTime + 5);
+            globalStartTime += this.trackTimeToMS(track.endTime + 15);
             if (i != 0) continue;
             setDriftlessTimeout(() => {
                 this.nextSong();

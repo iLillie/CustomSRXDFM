@@ -34,43 +34,66 @@ export class PlayerHandler {
     }
   }
 
-  getTotalStats(socketId: string) {
-    let index = 0;
-    let aliveCount = 0;
-    let indexOfPlayer = 0;
-    let totalScore: number = 0;
-    let scores: number[] = [];
-    let names: string[] = [];
-    let ranks: number[] = [];
-    let playerIds: string[] = [];
-    let isAlive: boolean = true;
-    let totalPlayers = 0;
-    for (let entry of this.players.entries()) {
-      if (entry[0] == socketId) {
-        indexOfPlayer = index;
-        isAlive = entry[1].isAlive;
-      }
-      index++;
-      totalScore += entry[1].score;
-      scores.push(entry[1].score);
-      playerIds.push(entry[1].id);
-      names.push(entry[1].name);
-      ranks.push(entry[1].ranks);
-      if (entry[1].isAlive) aliveCount++;
-      totalPlayers++;
-    }
+  getTotalScore() {
+    const initialValue = 0;
+    return [...this.players.values()].reduce(
+        (previousValue, currentValue) => previousValue + currentValue.score,
+        initialValue
+    )
+  }
+
+  scores() {
+    return [...this.players.values()].map(players => players.score);
+  }
+
+  names() {
+    return [...this.players.values()].map(players => players.name);
+  }
+
+  playerIds() {
+    return [...this.players.values()].map(players => players.id);
+  }
+
+  isAlive(socketId: string) {
+    return this.getPlayer(socketId).isAlive;
+  }
+
+  indexOfPlayer(socketId: string) {
+    return [...this.players.keys()].findIndex(value => value === socketId);
+  }
+
+  totalPlayers() {
+    return this.players.size;
+  }
+
+  aliveCount() {
+    return [...this.players.values()].filter(player => player.isAlive).length;
+  }
+
+  maxRank() {
+    return [...this.players.values()].filter(player => player.ranks != null).length;
+  }
+
+  ranks() {
+    return [...this.players.values()].map(player => player.ranks);
+  }
+
+
+
+
+  getPlayerLeaderboard(socketId: string) {
     return {
-      totalScore: totalScore,
-      playerIds: playerIds,
-      isAlive: isAlive,
-      scores: scores,
-      names: names,
-      ranks: ranks,
-      totalPlayers: totalPlayers,
-      indexOfPlayer: indexOfPlayer,
-      aliveCount: aliveCount,
-      maxRank: totalPlayers
-    };
+      playerIds: this.playerIds(),
+      names: this.names(),
+      scores: this.scores(),
+      isAlive: this.isAlive(socketId),
+      indexOfPlayer: this.indexOfPlayer(socketId),
+      totalScore: this.getTotalScore(),
+      totalPlayers: this.totalPlayers(),
+      aliveCount: this.aliveCount(),
+      maxRank: this.maxRank(),
+      ranks: this.ranks()
+    }
   }
 
   constructor() {

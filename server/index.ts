@@ -56,7 +56,7 @@ class Station {
     this.playerHandler.calculateRanks();
     return {
       song: this.songHandler.getLeaderboardSongs(),
-      ...this.playerHandler.getTotalStats(socketId),
+      ...this.playerHandler.getPlayerLeaderboard(socketId),
       playerIdsToRegister: this.playerHandler.idsToRegister,
       playerIdsToUnregister: [],
     }
@@ -100,6 +100,7 @@ function handleEmote(socket: Server.Socket, data: any, station: Station) {
 
 function handleSync(socket: Server.Socket, data: any, station: Station) {
   socket.emit("ntp:server_sync", { t0: data.t0, t1: Date.now() });
+  if(station.playerHandler.getPlayer(socket.conn.id) == undefined) return;
   socket.emit("leaderboard", station.getLeaderboard(socket.conn.id));
 }
 
