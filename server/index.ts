@@ -13,13 +13,7 @@ import { Track } from "./Track";
 
 const port = process.env.PORT || 3000;
 
-const io = Server(httpServer, {
-  origins: ["*:*"],
-  pingTimeout: 60000,
-  pingInterval: 25000,
-});
-
-io.use(require("socketio-wildcard")());
+const io = Server(httpServer);
 
 class Station {
   id: string;
@@ -131,6 +125,7 @@ io.of("/CustomFM").on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
+    console.log()
     handleDisconnect(socket, leaderboard);
   });
 
@@ -183,10 +178,6 @@ app.get("/api/stations", function (req, res) {
       leaderboard2.getStation()
     ],
   });
-});
-
-app.all("/**", function (req, res) {
-  console.log(req.url);
 });
 
 httpServer.listen(port, () => {
