@@ -2,35 +2,23 @@ import {setDriftlessTimeout} from "driftless";
 import {Track} from "./Track";
 import {Song} from "./Song";
 import EventEmitter from "events";
+import {TrackQueue} from "./TrackQueue";
 
 export class SongHandler {
     queuedSongs: Song[];
-    tracks: Track[];
     eventEmitter: EventEmitter;
+    trackQueue: TrackQueue;
 
-    randomTrack = () => this.tracks[Math.floor(Math.random() * this.tracks.length)];
-
-
-    // 3 songs
-    // 1
-    // callback - ends
-    // 2
-    //
-
-    nextQueue() {
-        this.queuedSongs.shift();
-        let song = this.newSong(this.queuedSongs[1].endTime);
-        this.queuedSongs.push(song);
-    }
 
     newSong(startTime: number) {
-        let randomTrack = this.randomTrack();
+        this.trackQueue.IncrementPos();
+        let track = this.trackQueue.GetTracks(1)[0];
         return new Song(
-            randomTrack.difficulty,
-            randomTrack.name,
-            randomTrack.leaderboardKey,
+            track.difficulty,
+            track.name,
+            track.leaderboardKey,
             startTime + 15000,
-            this.trackTimeToMS(randomTrack.endTime)
+            this.trackTimeToMS(track.endTime)
         );
     }
 
@@ -52,8 +40,9 @@ export class SongHandler {
     setupQueue() {
         if (this.queuedSongs.length != 0) return;
         let globalStartTime = 0;
-        for (let i = 0; i < 3; i++) {
-            let track = this.randomTrack();
+        let tracks: Track[] = this.trackQueue.GetTracks(3);
+        for (let i = 0; i < tracks.length; i++) {
+            const track = tracks[i];
             this.queuedSongs.push(new Song(track.difficulty, track.name, track.leaderboardKey, Date.now() + globalStartTime, this.trackTimeToMS(track.endTime)))
             globalStartTime += this.trackTimeToMS(track.endTime + 15);
             if (i != 0) continue;
@@ -86,9 +75,9 @@ export class SongHandler {
         }
     }
 
-    constructor(tracks: Track[]) {
+    constructor(trackQueue: TrackQueue) {
         this.queuedSongs = [];
-        this.tracks = tracks;
         this.eventEmitter = new EventEmitter();
+        this.trackQueue = trackQueue;
     }
 }
